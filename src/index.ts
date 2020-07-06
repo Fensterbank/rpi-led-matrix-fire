@@ -10,12 +10,11 @@ class RpiLedMatrixFire extends Command {
     // add --version flag to show CLI version
     version: flags.version({char: 'v'}),
     help: flags.help({char: 'h'}),
-    'led-rows': flags.integer(
-      {
-        default: 32,
-        char: 'r',
-        description: 'Rows of your LED panel in default hardware orientation',
-      }),
+    'led-rows': flags.integer({
+      default: 32,
+      char: 'r',
+      description: 'Rows of your LED panel in default hardware orientation',
+    }),
     'led-cols': flags.integer({
       default: 64,
       char: 'c',
@@ -30,10 +29,10 @@ class RpiLedMatrixFire extends Command {
       char: 'b',
       description: 'set the led brightness',
     }),
-    portrait: flags.boolean({
-      default: false,
-      char: 'p',
-      description: 'render portrait mode, otherwise landscape mode',
+    rotation: flags.integer({
+      default: 0,
+      char: 't',
+      description: 'rotate the fire 0, 90, 180 or 270 degrees',
     }),
   }
 
@@ -57,7 +56,7 @@ class RpiLedMatrixFire extends Command {
 
   drawField: any[] = [];
 
-  portrait = false;
+  rotation: 0 | 90 | 180 | 270 = 0;
 
   sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
@@ -65,13 +64,13 @@ class RpiLedMatrixFire extends Command {
 
   async run() {
     const {flags} = this.parse(RpiLedMatrixFire)
-    this.portrait = flags.portrait
+    this.rotation = flags.rotation as 0 | 90 | 180 | 270
 
     // Initialize width and height. Keep in mind we show the fire rotated,
     // w/h of matrix is in default orientation for driver
     this.matrixWidth = flags['led-cols']
     this.matrixHeight = flags['led-rows']
-    if (this.portrait) {
+    if (this.rotation === 90 || this.rotation === 270) {
       // inverted rows / cols since fire is rotated
       this.fireWidth = flags['led-rows']
       this.fireHeight = flags['led-cols']
@@ -80,8 +79,8 @@ class RpiLedMatrixFire extends Command {
       this.fireHeight = flags['led-rows']
     }
 
-    this.log(`Building the matrix with ${this.matrixWidth}x${this.matrixHeight}...`)
-    this.log(`Turning on fire with ${this.fireWidth}x${this.fireHeight}...`)
+    this.log(`${(new Date()).toISOString()} Building the matrix with ${this.matrixWidth}x${this.matrixHeight}...`)
+    this.log(`${(new Date()).toISOString()} Turning on fire with ${this.fireWidth}x${this.fireHeight}...`)
 
     this.brightness = flags.brightness
 
@@ -117,10 +116,8 @@ class RpiLedMatrixFire extends Command {
   }
 
   propagate() {
-    let col
-    let row
-    for (col = 0; col < this.fireWidth; col++) {
-      for (row = 1; row < this.fireHeight; row++) {
+    for (let col = 0; col < this.fireWidth; col++) {
+      for (let row = 1; row < this.fireHeight; row++) {
         this.updatePixelIntensity(col + (this.fireWidth * row))
       }
     }
@@ -139,20 +136,27 @@ class RpiLedMatrixFire extends Command {
   }
 
   burn() {
-    let col
-    let row
     this.drawField = []
     this.propagate()
-    for (col = 0; col < this.fireWidth; col++) {
-      for (row = 0; row < this.fireHeight; row++) {
+    for (let col = 0; col < this.fireWidth; col++) {
+      for (let row = 0; row < this.fireHeight; row++) {
         const index = col + (this.fireWidth * row)
-        const color = COLORS[this.intensities[index]]
-        if (this.portrait) {
-          // since we draw the fire rotated, we recalculate some things here
-          this.matrix.fgColor(color).setPixel(this.fireHeight - row, col)
-        } else {
-          // since we draw the fire rotated, we recalculate some things here
-          this.matrix.fgColor(color).setPixel(col, row)
+        this.matrix.fgColor(COLORS[this.intensities[index]])
+        // set pixels rotated based on option
+        switch (this.rotation) {
+        case 0:
+        default:
+          this.matrix.setPixel(col, row)
+          break
+        case 90:
+          this.matrix.setPixel(this.fireHeight - row, col)
+          break
+        case 180:
+          this.matrix.setPixel(col, this.fireHeight - row)
+          break
+        case 270:
+          this.matrix.setPixel(row, col)
+          break
         }
       }
     }
