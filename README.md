@@ -4,6 +4,7 @@ rpi-led-matrix-fire
 A fire for the RGB LED Matrix built on [oclif](https://oclif.io) and [rpi-rgb-led-matrix](https://github.com/hzeller/rpi-rgb-led-matrix).  
 The fire is based on the [»Doom Fire algorithm«](https://fabiensanglard.net/doom_fire_psx/) and the code is heavily inspired by [that random gist I found somewhere in the web](https://gist.github.com/coulix/969b8eebada45ab210fbac1e38555cde).
 
+![Sample Image of Lantern](/img/sample.jpg "Sample Image of Lantern")
 
 <!-- toc -->
 * [Usage](#usage)
