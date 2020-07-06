@@ -1,7 +1,7 @@
 {
   "name": "rpi-led-matrix-fire",
   "description": "A fire for the RGB LED Matrix",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "Frédéric Bolvin",
   "bin": {
     "rpi-led-matrix-fire": "./bin/run"
