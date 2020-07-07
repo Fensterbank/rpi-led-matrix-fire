@@ -26,11 +26,10 @@ $ sudo su
   -b, --brightness=brightness            [default: 100] set the led brightness
   -c, --led-cols=led-cols                [default: 64] Columns of your LED panel in default hardware orientation
   -h, --help                             show CLI help
-  -p, --portrait                         render portrait mode, otherwise landscape
   -r, --led-rows=led-rows                [default: 32] Rows of your LED panel in default hardware orientation
+  -t, --rotation=rotation                rotate the fire 0, 90, 180 or 270 degrees
   -v, --version                          show CLI version
   --led-slowdown-gpio=led-slowdown-gpio  [default: 4] Slowdown GPIO. Needed for faster Pis and/or slower panels
-
 ```
 
 # About this project
